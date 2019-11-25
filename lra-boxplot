@@ -1,0 +1,121 @@
+------------------------------------------------------------------
+
+# estabilsh the data frame of sensitivity in the light of model
+sens1 <- data.frame(myput_sens)
+colnames(sens1) <- "sens"
+sens1$model <- "LRA3"
+sens2 <- data.frame(myput_sens1)
+colnames(sens2) <- "sens"
+sens2$model <- "LRA2"
+sens3 <- data.frame(myput_sens2)
+colnames(sens3) <- "sens"
+sens3$model <- "LRA4"
+sens4 <- data.frame(myput_sens3)
+colnames(sens4) <- "sens"
+sens4$model <- "LRA5"
+boxplot_sens <- rbind(sens1, sens2, sens3, sens4)
+View(boxplot_sens)
+
+```
+# drawing sensitivity's boxplot
+ggplot(data = boxplot_sens, aes(x = model, y = sens)) + 
+  geom_boxplot(notch = F, outlier.shape = NA, aes(fill = factor(model))) + 
+  scale_fill_brewer(palette = "Pastel2") +
+  stat_summary(fun.y = "mean", size = 2, geom = "point") +
+  labs(x = "Model", y = "Sensitivity", title = "10-fold cross validation") +
+  theme(plot.title = element_text(hjust = 0.5, face = "bold.italic", family = "Times New Roman")) +
+  theme(panel.grid.major=element_line(colour=NA), 
+        panel.grid.minor = element_blank(), 
+        panel.background = element_blank(), 
+        axis.line = element_line(colour = "black"))
+# save picture
+ggsave("boxplot_sens2.png")
+dev.off()
+
+```
+------------------------------------------------------------------
+
+```
+spec1 <- data.frame(myput_spec)
+colnames(spec1) <- "spec"
+spec1$model <- "LRA3"
+spec2 <- data.frame(myput_spec1)
+colnames(spec2) <- "spec"
+spec2$model <- "LRA2"
+spec3 <- data.frame(myput_spec2)
+colnames(spec3) <- "spec"
+spec3$model <- "LRA4"
+spec4 <- data.frame(myput_spec3)
+colnames(spec4) <- "spec"
+spec4$model <- "LRA5"
+boxplot_spec <- rbind(spec1, spec2, spec3, spec4)
+View(boxplot_spec)
+
+# drawing sensitivity's boxplot
+ggplot(data = boxplot_spec, aes(x = model, y = spec)) + 
+  geom_boxplot(notch = T, outlier.shape = NA, aes(fill = factor(model))) + 
+  scale_fill_brewer(palette = "Pastel2") +
+  stat_summary(fun.y = "mean", size = 2, geom = "point") +
+  labs(x = "Model", y = "Specificity", title = "10-fold cross validation") +
+  theme(plot.title = element_text(hjust = 0.5, face = "bold.italic", family = "Times New Roman")) +
+  theme(panel.grid.major=element_line(colour=NA), 
+        panel.grid.minor = element_blank(), 
+        panel.background = element_blank(), 
+        axis.line = element_line(colour = "black"))
+# save picture
+ggsave("boxplot_spec.png")
+------------------------------------------------------------------
+
+```
+auc1 <- data.frame(myput_auc)
+colnames(auc1) <- "auc"
+auc1$model <- "LRA3"
+auc2 <- data.frame(myput_auc1)
+colnames(auc2) <- "auc"
+auc2$model <- "LRA2"
+auc3 <- data.frame(myput2)
+colnames(auc3) <- "auc"
+auc3$model <- "LRA4"
+auc4 <- data.frame(myput_auc3)
+colnames(auc4) <- "auc"
+auc4$model <- "LRA5"
+boxplot_auc <- rbind(auc1, auc2, auc3, auc4)
+head(boxplot_auc, 10)
+
+# drawing sensitivity's boxplot
+ggplot(data = boxplot_auc, aes(x = model, y = auc)) + 
+  geom_boxplot(notch = T, outlier.shape = NA, aes(fill = factor(model))) + 
+  scale_fill_brewer(palette = "Pastel2") +
+  stat_summary(fun.y = "mean", size = 2, geom = "point") +
+  labs(x = "Model", y = "Auc", title = "10-fold cross validation") +
+  theme(plot.title = element_text(hjust = 0.5, face = "bold.italic", family = "Times New Roman")) +
+  theme(panel.grid.major=element_line(colour=NA), 
+        panel.grid.minor = element_blank(), 
+        panel.background = element_blank(), 
+        axis.line = element_line(colour = "black"))
+ggsave("boxplot_auc.png")
+------------------------------------------------------------------
+
+# estabilsh the data frame of sensitivity in the light of model
+sens1 <- data.frame(myput_sens)
+colnames(sens1) <- "sens"
+sens1$model <- "LRA3"
+sens4 <- data.frame(myput_sens3)
+colnames(sens4) <- "sens"
+sens4$model <- "LRA5"
+boxplot_sens14 <- rbind(sens1,sens4)
+View(boxplot_sens14)
+# drawing sensitivity's boxplot
+ggplot(data = boxplot_sens, aes(x = model, y = sens)) + 
+  geom_boxplot(notch = F, outlier.shape = NA, aes(fill = factor(model))) + 
+  scale_fill_brewer(palette = "Pastel2") +
+  stat_summary(fun.y = "mean", size = 2, geom = "point") +
+  labs(x = "Model", y = "Sensitivity", title = "10-fold cross validation") +
+  theme(plot.title = element_text(hjust = 0.5, face = "bold.italic", family = "Times New Roman")) +
+  theme(panel.grid.major=element_line(colour=NA), 
+        panel.grid.minor = element_blank(), 
+        panel.background = element_blank(), 
+        axis.line = element_line(colour = "black"))
+# save picture
+ggsave("boxplot_sens2.png")
+dev.off()
