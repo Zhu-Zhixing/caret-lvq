@@ -1,0 +1,34 @@
+# ensure results are repeatable
+set.seed(7)
+
+# load the library
+library(ggplot2)
+library(lattice)
+library(mlbench)
+library(caret)
+
+# load the dataset
+pkudata <- read.csv(file = "/Users/zhuzhixing/Desktop/PKU/262_46PKU_4BH4.csv")
+
+# data cleaning
+pkudata1 <- pkudata[, -c(1:3)]
+pkudata2 <- pkudata1[, -c(1:2)]
+pkudata3 <- pkudata2[, -2]
+
+# convert infinite decimal to limited decimal with two decimal point
+pkudata_round <- round(pkudata3[, c(2:44)], digits = 2)
+
+# prepare training scheme
+control <- trainControl(method="repeatedcv", number=10, repeats=3)
+
+# train the model
+model <- train(result2~., data=pkudata3, method="lvq", preProcess="scale", trControl=control)
+
+# estimate variable importance
+importance <- varImp(model, scale=FALSE)
+
+# summarize importance
+print(importance)
+
+# plot importance
+plot(importance)
