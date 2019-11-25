@@ -1,0 +1,225 @@
+----------------------------------------------------------------
+```
+#load the dataset
+tablepku_r <- read.csv(file = "/Users/zhuzhixing/Desktop/tablepku_aim.csv", sep = ",")
+rownames(tablepku_r) <- tablepku_r[, 1]
+tablepku_r <- tablepku_r[, -1]
+
+# making logit of model z  = a0 + a1*PE
+mydata1 <- names(tablepku_r) %in% c("PE", "result")
+mypku_data1 <- tablepku_r[mydata1]
+View(mypku_data1)
+
+```
+----------------------------------------------------------------
+
+```
+# training the model
+set.seed(1234)
+ind <- sample(2, nrow(mypku_data1), replace=TRUE, prob=c(0.75, 0.25))
+mypku_traindata1 <- mypku_data1[ind==1,]     #creat a training dataset
+mypku_testdata1 <- mypku_data1[ind==2,]     #creat a testing dataset
+#transform the variable of result2 as a factor which is used to classify. After converting to a factor, the original variable is no longer simply a string or a value for parsing, but a category.
+mypku_traindata1 <- transform(mypku_traindata1, result=as.factor(result))
+mypku_testdata1 <- transform(mypku_testdata1, result=as.factor(result))
+mymodel1 <- glm(result~.,family = binomial(link = "logit") ,data = mypku_traindata1)
+summary(mymodel1)
+
+# make ROC
+# loading pROC package
+library(pROC)
+modelroc1 <- roc(mypku_traindata1$result, predict(mymodel1, mypku_traindata1, type='response'))
+png("myployroc.png", width=580*3,height=3*440,res=72*3)
+plot(modelroc1, 
+     print.auc = TRUE, auc.polygon = TRUE,
+     grid=c(0.1,0.2), grid.col=c("green","red"),
+     max.auc.polygon=TRUE, auc.polygon.col="pink",
+     print.thres=TRUE, print.thres.col = "skyblue4", print.thres.cex = 0.9, 
+     lty = 1, main=" ROC curve",mfrow=c(1,1))
+     
+# adjust cut-off value 
+pvalue <- predict(mymodel1, mypku_traindata1)
+pvalue1 <- exp(pvalue)/(1+exp(pvalue))
+mypku_traindata1$diag <- 1*(pvalue1>0.0948)
+con <- table(mypku_traindata1$diag, mypku_traindata1$result)
+
+# calculate specificity and compelete ROC
+abline(v = 0.5128, lty = 4)
+points(x= 0.5128, y = 1, pch = 8, col = "tomato4")
+text(x=0.5, y=0.95, paste("0.0948","(0.5128,1)"), cex = 0.9, adj = 0, col = "tomato4")
+
+# save roc
+dev.off()
+
+```
+----------------------------------------------------------------
+
+```
+# making logit of model z  = a0 + a1*PE + a2*TYR
+mydata2 <- names(tablepku_r) %in% c("result","TYR", "PE")
+mypku_data2 <- tablepku_r[mydata2]
+View(mypku_data2)
+
+```
+
+# training the model
+set.seed(1234)
+ind2 <- sample(2, nrow(mypku_data2), replace=TRUE, prob=c(0.75, 0.25))
+mypku_traindata2 <- mypku_data2[ind2==1,]     #creat a training dataset
+mypku_testdata2 <- mypku_data2[ind2==2,]     #creat a testing dataset
+#transform the variable of result2 as a factor which is used to classify. After converting to a factor, the original variable is no longer simply a string or a value for parsing, but a category.
+mypku_traindata2 <- transform(mypku_traindata2, result=as.factor(result))
+mypku_testdata2 <- transform(mypku_testdata2, result=as.factor(result))
+mymodel2 <- glm(result~.,family = binomial(link = "logit") ,data = mypku_traindata2)
+summary(mymodel2)
+
+modelroc2 <- roc(mypku_traindata2$result, predict(mymodel2, type = 'response'))
+png("LRA2_roc.png", width=580*3,height=3*440,res=72*3)
+plot(modelroc2, 
+     print.auc = TRUE, auc.polygon = TRUE,
+     grid=c(0.1,0.2), grid.col=c("green","red"),
+     max.auc.polygon=TRUE, auc.polygon.col="pink",
+     print.thres=TRUE, print.thres.col = "skyblue4", print.thres.cex = 0.9, 
+     lty = 1, main=" ROC curve",mfrow=c(1,1))
+     
+#adjust cut-off value to guarantee 100% sensitivity 
+pvaluet2 <- predict(mymodel2, mypku_traindata2)
+pvaluet_2 <- exp(pvaluet2)/(1+exp(pvaluet2))
+mypku_traindata2$diag <- 1*(pvaluet_2>0.0528)
+con2 <- table(mypku_traindata2$diag, mypku_traindata2$result)
+
+#calculate specificity and complete ROC
+abline(v = 0.4423, lty = 4)
+points(x= 0.4423, y = 1, pch = 8, col = "tomato4")
+text(x=0.43, y=0.95, paste("0.0528","(0.4423,1)"), cex = 0.9, adj = 0, col = "tomato4")
+
+# save ROC
+dev.off()
+dev.new()
+
+```
+----------------------------------------------------------------
+
+```
+# making logit of model z  = a0 + a1*MET.PE + a2*C4
+mydata3 <- names(tablepku_r) %in% c("PE","TYR","MET.PE", "result")
+mypku_data3 <- tablepku_r[mydata3]
+View(mypku_data3)
+
+# training the model
+set.seed(1234)
+ind <- sample(2, nrow(mypku_data3), replace=TRUE, prob=c(0.75, 0.25))
+mypku_traindata3 <- mypku_data3[ind==1,]     #creat a training dataset
+mypku_testdata3 <- mypku_data3[ind==2,]     #creat a testing dataset
+#transform the variable of result2 as a factor which is used to classify. After converting to a factor, the original variable is no longer simply a string or a value for parsing, but a category.
+mypku_traindata3 <- transform(mypku_traindata3, result=as.factor(result))
+mypku_testdata3 <- transform(mypku_testdata3, result=as.factor(result))
+mymodel3 <- glm(result~.,family = binomial(link = "logit") ,data = mypku_traindata3)
+summary(mymodel3)
+
+library(pROC)
+modelroc3 <- roc(mypku_traindata3$result, predict(mymodel3, mypku_traindata3, type='response'))
+
+# make ROC
+png("LRA3_roc.png", width=580*3,height=3*440,res=72*3)
+plot(modelroc3, 
+     print.auc = TRUE, auc.polygon = TRUE,
+     grid=c(0.1,0.2), grid.col=c("green","red"),
+     max.auc.polygon=TRUE, auc.polygon.col="pink",
+     print.thres=TRUE, print.thres.col = "skyblue4", print.thres.cex = 0.9, 
+     lty = 1, main=" ROC curve",mfrow=c(1,1))
+
+# adjust cut-off value 
+pvalue3 <- predict(mymodel3, mypku_traindata3)
+pvalue_3 <- exp(pvalue3)/(1+exp(pvalue3))
+mypku_traindata3$diag <- 1*(pvalue_3>0.0579)
+con3 <- table(mypku_traindata3$diag, mypku_traindata3$result)
+
+# calculate specificity and compelete ROC
+abline(v = 0.6282, lty = 4)
+points(x= 0.6282, y = 1, pch = 8, col = "tomato4")
+text(x=0.62, y=0.95, paste("0.0579","(0.6282,1)"), cex = 0.9, adj = 0, col = "tomato4")
+
+# save roc
+dev.off()
+
+```
+----------------------------------------------------------------
+
+```
+# making logit of model z  = a0 + a1*MET.PE
+mydata4 <- names(tablepku_r) %in% c("result", "MET.PE")
+mypku_data4 <- tablepku_r[mydata4]
+View(mypku_data4)
+
+# training the model
+set.seed(1234)
+ind4 <- sample(2, nrow(mypku_data4), replace=TRUE, prob=c(0.75, 0.25))
+mypku_traindata4 <- mypku_data4[ind4==1,]     #creat a training dataset
+mypku_testdata4 <- mypku_data4[ind4==2,]     #creat a testing dataset
+#transform the variable of result2 as a factor which is used to classify. After converting to a factor, the original variable is no longer simply a string or a value for parsing, but a category.
+mypku_traindata4 <- transform(mypku_traindata4, result=as.factor(result))
+mypku_testdata4 <- transform(mypku_testdata4, result=as.factor(result))
+mymodel4 <- glm(result~.,family = binomial(link = "logit") ,data = mypku_traindata4)
+summary(mymodel4)
+
+p4 <- predict(mymodel4, mypku_traindata4)
+pr_4 <- exp(p4)/(1+exp(p4))
+mypku_traindata4$diag <- 1*(pr_4>0.0220)
+con4 <- table(mypku_traindata4$diag, mypku_traindata4$result)
+modelroc4 <- roc(mypku_traindata4$result, predict(mymodel4, type = 'response'))
+
+png("myployroc4.png", width=580*3,height=3*440,res=72*3)
+plot(modelroc4, 
+     print.auc = TRUE, auc.polygon = TRUE,
+     grid=c(0.1,0.2), grid.col=c("green","red"),
+     max.auc.polygon=TRUE, auc.polygon.col="pink",
+     print.thres=TRUE, print.thres.col = "skyblue4", print.thres.cex = 0.9, 
+     lty = 1, main=" ROC curve",mfrow=c(1,1))
+abline(v = 0.5, lty = 4)
+points(x= 0.5, y = 1, pch = 8, col = "tomato4")
+text(x=0.48, y=0.95, paste("0.0220","(0.5,1)"), cex = 0.9, adj = 0, col = "tomato4")
+dev.off()
+
+```
+----------------------------------------------------------------
+
+```
+webdata <- names(tablepku_r) %in% c("AA", "MET", "PE", "C4", "C16.1", "EU", "TYR", "result")
+webpku <- tablepku_r[webdata]
+webpku$EU_TYR <- webpku$EU * webpku$TYR
+webpku_aim <- subset(webpku, select = -c(3, 6))
+head(webpku_aim)
+
+set.seed(1234)
+ind5 <- sample(2, nrow(webpku_aim), replace = TRUE, prob = c(0.75, 0.25))
+trainweb <- webpku_aim[ind5 ==1, ]
+testweb <- webpku_aim[ind5 ==2, ]
+trainweb <- transform(trainweb, result=as.factor(result))
+testweb <- transform(testweb, result=as.factor(result))
+webmodel <- glm(result~.,family = binomial(link = "logit") ,data = trainweb)
+summary(webmodel)
+
+pvalue5 <- predict(webmodel, trainweb)
+pvalue_5 <- exp(pvalue5)/(1+exp(pvalue5))
+trainweb$diag <- 1*(pvalue_5>0.0211)
+con5 <- table(trainweb$diag, trainweb$result)
+modelroc5 <- roc(trainweb$result, predict(webmodel, trainweb, type = "response"))
+
+png("webmodelroc.png", width=580*3,height=3*440,res=72*3)
+plot(modelroc5, 
+     print.auc = TRUE, auc.polygon = TRUE,
+     grid=c(0.1,0.2), grid.col=c("green","red"),
+     max.auc.polygon=TRUE, auc.polygon.col="pink",
+     print.thres=TRUE, print.thres.col = "skyblue4", print.thres.cex = 0.9, 
+     lty = 1, main=" ROC curve",mfrow=c(1,1))
+abline(v = 0.4551, lty = 4)
+points(x= 0.4551, y = 1, pch = 8, col = "tomato4")
+text(x=0.45, y=0.95, paste("0.0211","(0.4551,1)"), cex = 0.9, adj = 0, col = "tomato4")
+dev.off()
+
+```
+----------------------------------------------------------------
+
+Author(and email)
+Zhixing Zhu(981164372@qq.com)
