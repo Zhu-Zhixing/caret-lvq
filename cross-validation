@@ -2,123 +2,38 @@
 data(mypku_testdata2)
 data(mypku_testdata3)
 data(mypku_testdata4)
-data(mypku_testdata5)
+data(webpku_aim)
 
+----------------------------------------------------------------
 
+```
+# making logit of model z  = a0 + a1*PE
 #10-fold crossvalidation by testdatabase
 set.seed(1234)
 i=1
-myput_auc = rep(0, 100)
-myput_acc <- rep(0, 100)
-myput_sens <- rep(0, 100)
-myput_spec <- rep(0, 100)
-myput_ppv <- rep(0, 100)
-myput_npv <- rep(0, 100)
-for (i in c(1:100)) {
-  ind <- sample(2, nrow(mypku_data), replace=TRUE, prob=c(0.75, 0.25))
-  mypku_traindata <- mypku_data[ind==1,]     #creat a training dataset
-  mypku_testdata <- mypku_data[ind==2,]     #creat a testing dataset
-  #transform the variable of result2 as a factor which is used to classify. After converting to a factor, the original variable is no longer simply a string or a value for parsing, but a category.
-  mypku_traindata <- transform(mypku_traindata, result=as.factor(result))
-  mypku_testdata <- transform(mypku_testdata, result=as.factor(result))
-  mymodel <- glm(result~.,family = binomial(link = "logit") ,data = mypku_traindata)
-  p = predict(mymodel, mypku_testdata)
-  pr = exp(p)/(1+exp(p))
-  mypku_testdata$diag = 1*(pr>0.0579)
-  conf <- table(mypku_testdata$diag, mypku_testdata$result)
-  acc <- sum(diag(conf))/sum(conf)
-  sens <- sum(conf[2, 2])/sum(conf[, 2])
-  spec <- sum(conf[1,1])/sum(conf[, 1])
-  ppv <- sum(conf[2, 2])/sum(conf[2, ])
-  npv <- sum(conf[1,1])/sum(conf[1, ])
-  #test_pre <- predict(mymodel, mypku_testdata, type = "response") # this processs is similar with calculate p value 
-  test_pred <- prediction(pr, mypku_testdata$result)
-  auc <- performance(test_pred, 'auc')
-  auc <- auc@y.values
-  myput_auc[i] <- as.numeric(auc)
-  myput_acc[i] <- as.numeric(acc)
-  myput_sens[i] <- as.numeric(sens)
-  myput_spec[i] <- as.numeric(spec)
-  myput_ppv[i] <- as.numeric(ppv)
-  myput_npv[i] <- as.numeric(npv)
-}
-mean(myput_auc)
-mean(myput_acc)
-mean(myput_sens)
-mean(myput_spec)
-mean(myput_ppv)
-mean(myput_npv)
-sd(myput_auc)
-sd(myput_acc)
-sd(myput_sens)
-sd(myput_spec)
-sd(myput_ppv)
-sd(myput_npv)
-
-
-# making logit of model z  = a0 + a1*MET.PE
-mydata2 <- names(tablepku_r) %in% c("result","TYR", "PE")
-mypku_data2 <- tablepku_r[mydata2]
-View(mypku_data2)
-# training the model
-set.seed(1234)
-ind2 <- sample(2, nrow(mypku_data2), replace=TRUE, prob=c(0.75, 0.25))
-mypku_traindata2 <- mypku_data2[ind2==1,]     #creat a training dataset
-mypku_testdata2 <- mypku_data2[ind2==2,]     #creat a testing dataset
-#transform the variable of result2 as a factor which is used to classify. After converting to a factor, the original variable is no longer simply a string or a value for parsing, but a category.
-mypku_traindata2 <- transform(mypku_traindata2, result=as.factor(result))
-mypku_testdata2 <- transform(mypku_testdata2, result=as.factor(result))
-mymodel2 <- glm(result~.,family = binomial(link = "logit") ,data = mypku_traindata2)
-summary(mymodel2)
-modelroc2 <- roc(mypku_traindata2$result, predict(mymodel2, type = 'response'))
-png("LRA2_roc.png", width=580*3,height=3*440,res=72*3)
-plot(modelroc2, 
-     print.auc = TRUE, auc.polygon = TRUE,
-     grid=c(0.1,0.2), grid.col=c("green","red"),
-     max.auc.polygon=TRUE, auc.polygon.col="pink",
-     print.thres=TRUE, print.thres.col = "skyblue4", print.thres.cex = 0.9, 
-     lty = 1, main=" ROC curve",mfrow=c(1,1))
-#adjust cut-off value to guarantee 100% sensitivity 
-pvaluet2 <- predict(mymodel2, mypku_traindata2)
-pvaluet_2 <- exp(pvaluet2)/(1+exp(pvaluet2))
-mypku_traindata2$diag <- 1*(pvaluet_2>0.0528)
-con2 <- table(mypku_traindata2$diag, mypku_traindata2$result)
-#calculate specificity and complete ROC
-abline(v = 0.4423, lty = 4)
-points(x= 0.4423, y = 1, pch = 8, col = "tomato4")
-text(x=0.43, y=0.95, paste("0.0528","(0.4423,1)"), cex = 0.9, adj = 0, col = "tomato4")
-# save ROC
-dev.off()
-dev.new()
-
-
-#10-fold crossvalidation by testdatabase
-set.seed(1234)
-i=1
-myput_auc1 <- rep(0, 100)
+myput_auc1 = rep(0, 100)
 myput_acc1 <- rep(0, 100)
 myput_sens1 <- rep(0, 100)
 myput_spec1 <- rep(0, 100)
 myput_ppv1 <- rep(0, 100)
 myput_npv1 <- rep(0, 100)
 for (i in c(1:100)) {
-  ind1 <- sample(2, nrow(mypku_data1), replace=TRUE, prob=c(0.75, 0.25))
-  mypku_traindata1 <- mypku_data1[ind1==1,]     #creat a training dataset
-  mypku_testdata1 <- mypku_data1[ind1==2,]     #creat a testing dataset
+  ind <- sample(2, nrow(mypku_data1), replace=TRUE, prob=c(0.75, 0.25))
+  mypku_traindata1 <- mypku_data1[ind==1,]     #creat a training dataset
+  mypku_testdata1 <- mypku_data1[ind==2,]     #creat a testing dataset
   #transform the variable of result2 as a factor which is used to classify. After converting to a factor, the original variable is no longer simply a string or a value for parsing, but a category.
   mypku_traindata1 <- transform(mypku_traindata1, result=as.factor(result))
   mypku_testdata1 <- transform(mypku_testdata1, result=as.factor(result))
   mymodel1 <- glm(result~.,family = binomial(link = "logit") ,data = mypku_traindata1)
   p1 = predict(mymodel1, mypku_testdata1)
   pr1 = exp(p1)/(1+exp(p1))
-  mypku_testdata1$diag = 1*(pr1>0.0528)
+  mypku_testdata1$diag = 1*(pr1>0.0948)
   conf1 <- table(mypku_testdata1$diag, mypku_testdata1$result)
   acc1 <- sum(diag(conf1))/sum(conf1)
   sens1 <- sum(conf1[2, 2])/sum(conf1[, 2])
   spec1 <- sum(conf1[1,1])/sum(conf1[, 1])
   ppv1 <- sum(conf1[2, 2])/sum(conf1[2, ])
   npv1 <- sum(conf1[1,1])/sum(conf1[1, ])
-  #test_pre <- predict(mymodel, mypku_testdata, type = "response") # this processs is similar with calculate p value 
   test_pred1 <- prediction(pr1, mypku_testdata1$result)
   auc1 <- performance(test_pred1, 'auc')
   auc1 <- auc1@y.values
@@ -142,65 +57,12 @@ sd(myput_spec1)
 sd(myput_ppv1)
 sd(myput_npv1)
 
+```
+----------------------------------------------------------------
 
-# make auc's and sensitivity's boxplot
-# establish the data frame of auc in the light of model
-auc1 <- data.frame(myput_auc)
-colnames(auc1) <- "auc"
-auc2 <- data.frame(myput_auc1)
-colnames(auc2) <- "auc"
-boxauc <- rbind(auc1, auc2)
-#assign new variable to boxauc
-boxauc$model <- rep(c(1, 2), each = 100)
-# used ifelse() function and modify the data of model variable 
-boxauc$model <- ifelse(boxauc$model ==1, "Met/Phe, C4", "Met/Phe")
-View(boxauc)
-# loading ggplot2 package and drawing auc's boxplot
-library(ggplot2)
-ggplot(data = boxauc, aes(x = model, y = auc)) + 
-  geom_boxplot(notch = T, outlier.shape = NA, aes(fill = factor(model))) + 
-  scale_fill_brewer(palette = "Pastel2") +
-  stat_summary(fun.y = "mean", size = 2, geom = "point") +
-  labs(x = "Model", y = "Auc",title = "10-fold cross validation") +
-  theme(plot.title = element_text(hjust = 0.5, face = "bold.italic", family = "Times New Roman")) +
-  theme(panel.grid.major=element_line(colour=NA), 
-        panel.grid.minor = element_blank(), 
-        panel.background = element_blank(), 
-        axis.line = element_line(colour = "black"))
-# save picture
-ggsave("ggplot_boxplot_auc_mean.png")
+```
 
-
-# making logit of model z  = a0 + a1*MET.PE + a2*PE.TYR + a3*PE + a4*TYR + a5*C4
-mydata4 <- names(tablepku_r) %in% c("result", "MET.PE")
-mypku_data4 <- tablepku_r[mydata4]
-View(mypku_data4)
-# training the model
-set.seed(1234)
-ind4 <- sample(2, nrow(mypku_data4), replace=TRUE, prob=c(0.75, 0.25))
-mypku_traindata4 <- mypku_data4[ind4==1,]     #creat a training dataset
-mypku_testdata4 <- mypku_data4[ind4==2,]     #creat a testing dataset
-#transform the variable of result2 as a factor which is used to classify. After converting to a factor, the original variable is no longer simply a string or a value for parsing, but a category.
-mypku_traindata4 <- transform(mypku_traindata4, result=as.factor(result))
-mypku_testdata4 <- transform(mypku_testdata4, result=as.factor(result))
-mymodel4 <- glm(result~.,family = binomial(link = "logit") ,data = mypku_traindata4)
-summary(mymodel4)
-p4 <- predict(mymodel4, mypku_traindata4)
-pr_4 <- exp(p4)/(1+exp(p4))
-mypku_traindata4$diag <- 1*(pr_4>0.0220)
-con4 <- table(mypku_traindata4$diag, mypku_traindata4$result)
-modelroc4 <- roc(mypku_traindata4$result, predict(mymodel4, type = 'response'))
-png("myployroc4.png", width=580*3,height=3*440,res=72*3)
-plot(modelroc4, 
-     print.auc = TRUE, auc.polygon = TRUE,
-     grid=c(0.1,0.2), grid.col=c("green","red"),
-     max.auc.polygon=TRUE, auc.polygon.col="pink",
-     print.thres=TRUE, print.thres.col = "skyblue4", print.thres.cex = 0.9, 
-     lty = 1, main=" ROC curve",mfrow=c(1,1))
-abline(v = 0.5, lty = 4)
-points(x= 0.5, y = 1, pch = 8, col = "tomato4")
-text(x=0.48, y=0.95, paste("0.0220","(0.5,1)"), cex = 0.9, adj = 0, col = "tomato4")
-dev.off()
+# making logit of model z  = a0 + a1*PE + a2*TYR
 #10-fold crossvalidation by testdatabase
 set.seed(1234)
 i=1
@@ -244,44 +106,19 @@ mean(myput_sens2)
 mean(myput_spec2)
 mean(myput_ppv2)
 mean(myput_npv2)
-sd(myput1)
-sd(myput_acc1)
-sd(myput_sens1)
-sd(myput_spec1)
-sd(myput_ppv1)
-sd(myput_npv1)
+sd(myput2)
+sd(myput_acc2)
+sd(myput_sens2)
+sd(myput_spec2)
+sd(myput_ppv2)
+sd(myput_npv2)
 
+```
+----------------------------------------------------------------
 
-webdata <- names(tablepku_r) %in% c("AA", "MET", "PE", "C4", "C16.1", "EU", "TYR", "result")
-webpku <- tablepku_r[webdata]
-webpku$EU_TYR <- webpku$EU * webpku$TYR
-webpku_aim <- subset(webpku, select = -c(3, 6))
-head(webpku_aim)
-set.seed(1234)
-ind5 <- sample(2, nrow(webpku_aim), replace = TRUE, prob = c(0.75, 0.25))
-trainweb <- webpku_aim[ind5 ==1, ]
-testweb <- webpku_aim[ind5 ==2, ]
-trainweb <- transform(trainweb, result=as.factor(result))
-testweb <- transform(testweb, result=as.factor(result))
-webmodel <- glm(result~.,family = binomial(link = "logit") ,data = trainweb)
-summary(webmodel)
-pvalue5 <- predict(webmodel, trainweb)
-pvalue_5 <- exp(pvalue5)/(1+exp(pvalue5))
-trainweb$diag <- 1*(pvalue_5>0.0211)
-con5 <- table(trainweb$diag, trainweb$result)
-modelroc5 <- roc(trainweb$result, predict(webmodel, trainweb, type = "response"))
-png("webmodelroc.png", width=580*3,height=3*440,res=72*3)
-plot(modelroc5, 
-     print.auc = TRUE, auc.polygon = TRUE,
-     grid=c(0.1,0.2), grid.col=c("green","red"),
-     max.auc.polygon=TRUE, auc.polygon.col="pink",
-     print.thres=TRUE, print.thres.col = "skyblue4", print.thres.cex = 0.9, 
-     lty = 1, main=" ROC curve",mfrow=c(1,1))
-abline(v = 0.4551, lty = 4)
-points(x= 0.4551, y = 1, pch = 8, col = "tomato4")
-text(x=0.45, y=0.95, paste("0.0211","(0.4551,1)"), cex = 0.9, adj = 0, col = "tomato4")
-dev.off()
-
+```
+# making logit of model z  = a0 + a1*PE + a2*TYR + a3*MET.PE
+#10-fold crossvalidation by testdatabase
 set.seed(1234)
 i=1
 myput_auc3 = rep(0, 100)
@@ -291,27 +128,26 @@ myput_spec3 <- rep(0, 100)
 myput_ppv3 <- rep(0, 100)
 myput_npv3 <- rep(0, 100)
 for (i in c(1:100)) {
-  ind3 <- sample(2, nrow(webpku_aim), replace = TRUE, prob = c(0.75, 0.25))
-  trainweb <- webpku_aim[ind3 ==1, ]
-  testweb <- webpku_aim[ind3 ==2, ]
-  trainweb <- transform(trainweb, result=as.factor(result))
-  testweb <- transform(testweb, result=as.factor(result))
-  webmodel <- glm(result~.,family = binomial(link = "logit") ,data = trainweb)
-  #testing
-  p3 = predict(webmodel, testweb)
-  pr3 <- exp(p3)/(1+exp(p3))
-  testweb$diag <- 1*(pr3>0.021)
-  conf3 <- table(testweb$diag, testweb$result)
-  acc3 <- sum(diag(conf3))/sum(conf3)
+  ind <- sample(2, nrow(mypku_data3), replace=TRUE, prob=c(0.75, 0.25))
+  mypku_traindata3 <- mypku_data3[ind==1,]     #creat a training dataset
+  mypku_testdata3 <- mypku_data3[ind==2,]     #creat a testing dataset
+  #transform the variable of result2 as a factor which is used to classify. After converting to a factor, the original variable is no longer simply a string or a value for parsing, but a category.
+  mypku_testdata3 <- transform(mypku_testdata3, result=as.factor(result))
+  mymodel3 <- glm(result~.,family = binomial(link = "logit") ,data = mypku_traindata3)
+  summary(mymodel3)
+  p3 = predict(mymodel3, mypku_testdata3)
+  pr3 = exp(p3)/(1+exp(p3))
+  mypku_traindata3$diag <- 1*(pr3>0.0579)
+  conf3 <- table(mypku_testdata3$diag, mypku_testdata3$result)
+  acc3 <- sum(diag(conf1))/sum(conf3)
   sens3 <- sum(conf3[2, 2])/sum(conf3[, 2])
   spec3 <- sum(conf3[1,1])/sum(conf3[, 1])
   ppv3 <- sum(conf3[2, 2])/sum(conf3[2, ])
   npv3 <- sum(conf3[1,1])/sum(conf3[1, ])
-  #test_pre <- predict(mymodel, mypku_testdata, type = "response") # this processs is similar with calculate p value 
-  test_pred <- prediction(pr3, testweb$result)
-  pred_auc <- performance(test_pred, 'auc')
-  pred_auc <- pred_auc@y.values
-  myput_auc3[i] <- as.numeric(pred_auc)
+  test_pred3 <- prediction(pr3, mypku_testdata3$result)
+  auc3 <- performance(test_pred3, 'auc')
+  auc3 <- auc3@y.values
+  myput_auc3[i] <- as.numeric(auc3)
   myput_acc3[i] <- as.numeric(acc3)
   myput_sens3[i] <- as.numeric(sens3)
   myput_spec3[i] <- as.numeric(spec3)
@@ -324,117 +160,127 @@ mean(myput_sens3)
 mean(myput_spec3)
 mean(myput_ppv3)
 mean(myput_npv3)
+sd(myput_auc3)
+sd(myput_acc3)
+sd(myput_sens3)
+sd(myput_spec3)
+sd(myput_ppv3)
+sd(myput_npv3)
+
+```
+----------------------------------------------------------------
+
+```
+# making logit of model z  = a0 + a1*MET.PE
+set.seed(1234)
+i=1
+myput_auc4 = rep(0, 100)
+myput_acc4 <- rep(0, 100)
+myput_sens4 <- rep(0, 100)
+myput_spec4 <- rep(0, 100)
+myput_ppv4 <- rep(0, 100)
+myput_npv4 <- rep(0, 100)
+for (i in c(1:100)) {
+  ind4 <- sample(2, nrow(mypku_data4), replace=TRUE, prob=c(0.75, 0.25))
+  mypku_traindata4 <- mypku_data4[ind4==1,]     #creat a training dataset
+  mypku_testdata4 <- mypku_data4[ind4==2,]     #creat a testing dataset
+  #transform the variable of result2 as a factor which is used to classify. After converting to a factor, the original variable is no longer simply a string or a value for parsing, but a category.
+  mypku_traindata4 <- transform(mypku_traindata4, result=as.factor(result))
+  mypku_testdata4 <- transform(mypku_testdata4, result=as.factor(result))
+  mymodel4 <- glm(result~.,family = binomial(link = "logit") ,data = mypku_traindata4)
+  summary(mymodel4)
+  p4 <- predict(mymodel4, mypku_traindata4)
+  pr4 <- exp(p4)/(1+exp(p4))
+  mypku_traindata4$diag <- 1*(pr4>0.0220)
+  conf4 <- table(mypku_testdata4$diag, mypku_testdata4$result)
+  acc4 <- sum(diag(conf4))/sum(conf4)
+  sens4 <- sum(conf4[2, 2])/sum(conf4[, 2])
+  spec4 <- sum(conf4[1,1])/sum(conf4[, 1])
+  ppv4 <- sum(conf4[2, 2])/sum(conf4[2, ])
+  npv4 <- sum(conf4[1,1])/sum(conf4[1, ])
+  test_pred4 <- prediction(pr4, mypku_testdata4$result)
+  auc4 <- performance(test_pred4, 'auc')
+  auc4 <- auc4@y.values
+  myput_auc4[i] <- as.numeric(auc4)
+  myput_acc4[i] <- as.numeric(acc4)
+  myput_sens4[i] <- as.numeric(sens4)
+  myput_spec4[i] <- as.numeric(spec4)
+  myput_ppv4[i] <- as.numeric(ppv4)
+  myput_npv4[i] <- as.numeric(npv4)
+}
+mean(myput_auc4)
+mean(myput_acc4)
+mean(myput_sens4)
+mean(myput_spec4)
+mean(myput_ppv4)
+mean(myput_npv4)
+sd(myput_auc4)
+sd(myput_acc4)
+sd(myput_sens4)
+sd(myput_spec4)
+sd(myput_ppv4)
+sd(myput_npv4)
+
+```
+----------------------------------------------------------------
+
+```
+set.seed(1234)
+i=1
+myput_auc5 = rep(0, 100)
+myput_acc5 <- rep(0, 100)
+myput_sens5 <- rep(0, 100)
+myput_spec5 <- rep(0, 100)
+myput_ppv5 <- rep(0, 100)
+myput_npv5 <- rep(0, 100)
+for (i in c(1:100)) {
+  ind5 <- sample(2, nrow(webpku_aim), replace = TRUE, prob = c(0.75, 0.25))
+  trainweb <- webpku_aim[ind5 ==1, ]
+  testweb <- webpku_aim[ind5 ==2, ]
+  trainweb <- transform(trainweb, result=as.factor(result))
+  testweb <- transform(testweb, result=as.factor(result))
+  webmodel <- glm(result~.,family = binomial(link = "logit") ,data = trainweb)
+  #testing
+  p5 = predict(webmodel, testweb)
+  pr5 <- exp(p5)/(1+exp(p5))
+  testweb$diag <- 1*(pr5>0.021)
+  conf5 <- table(testweb$diag, testweb$result)
+  acc5 <- sum(diag(conf5))/sum(conf5)
+  sens5 <- sum(conf5[2, 2])/sum(conf5[, 2])
+  spec5 <- sum(conf5[1,1])/sum(conf5[, 1])
+  ppv5 <- sum(conf5[2, 2])/sum(conf5[2, ])
+  npv5 <- sum(conf5[1,1])/sum(conf5[1, ]) 
+  test_pred5 <- prediction(pr5, testweb$result)
+  pred_auc <- performance(test_pred5, 'auc')
+  pred_auc <- pred_auc@y.values
+  myput_auc5[i] <- as.numeric(pred_auc)
+  myput_acc5[i] <- as.numeric(acc5)
+  myput_sens5[i] <- as.numeric(sens5)
+  myput_spec5[i] <- as.numeric(spec5)
+  myput_ppv5[i] <- as.numeric(ppv5)
+  myput_npv5[i] <- as.numeric(npv5)
+}
+mean(myput_auc5)
+mean(myput_acc5)
+mean(myput_sens5)
+mean(myput_spec5)
+mean(myput_ppv5)
+mean(myput_npv5)
+sd(myput_auc5)
+sd(myput_acc5)
+sd(myput_sens5)
+sd(myput_spec5)
+sd(myput_ppv5)
+sd(myput_npv5)
+
+```
+----------------------------------------------------------------
+
+Author(and email)
+Zhixing Zhu(981164372@qq.com)
 
 
-# estabilsh the data frame of sensitivity in the light of model
-sens1 <- data.frame(myput_sens)
-colnames(sens1) <- "sens"
-sens1$model <- "LRA3"
-sens2 <- data.frame(myput_sens1)
-colnames(sens2) <- "sens"
-sens2$model <- "LRA2"
-sens3 <- data.frame(myput_sens2)
-colnames(sens3) <- "sens"
-sens3$model <- "LRA4"
-sens4 <- data.frame(myput_sens3)
-colnames(sens4) <- "sens"
-sens4$model <- "LRA5"
-boxplot_sens <- rbind(sens1, sens2, sens3, sens4)
-View(boxplot_sens)
-# drawing sensitivity's boxplot
-ggplot(data = boxplot_sens, aes(x = model, y = sens)) + 
-  geom_boxplot(notch = F, outlier.shape = NA, aes(fill = factor(model))) + 
-  scale_fill_brewer(palette = "Pastel2") +
-  stat_summary(fun.y = "mean", size = 2, geom = "point") +
-  labs(x = "Model", y = "Sensitivity", title = "10-fold cross validation") +
-  theme(plot.title = element_text(hjust = 0.5, face = "bold.italic", family = "Times New Roman")) +
-  theme(panel.grid.major=element_line(colour=NA), 
-        panel.grid.minor = element_blank(), 
-        panel.background = element_blank(), 
-        axis.line = element_line(colour = "black"))
-# save picture
-ggsave("boxplot_sens2.png")
-dev.off()
 
 
-spec1 <- data.frame(myput_spec)
-colnames(spec1) <- "spec"
-spec1$model <- "LRA3"
-spec2 <- data.frame(myput_spec1)
-colnames(spec2) <- "spec"
-spec2$model <- "LRA2"
-spec3 <- data.frame(myput_spec2)
-colnames(spec3) <- "spec"
-spec3$model <- "LRA4"
-spec4 <- data.frame(myput_spec3)
-colnames(spec4) <- "spec"
-spec4$model <- "LRA5"
-boxplot_spec <- rbind(spec1, spec2, spec3, spec4)
-View(boxplot_spec)
-# drawing sensitivity's boxplot
-ggplot(data = boxplot_spec, aes(x = model, y = spec)) + 
-  geom_boxplot(notch = T, outlier.shape = NA, aes(fill = factor(model))) + 
-  scale_fill_brewer(palette = "Pastel2") +
-  stat_summary(fun.y = "mean", size = 2, geom = "point") +
-  labs(x = "Model", y = "Specificity", title = "10-fold cross validation") +
-  theme(plot.title = element_text(hjust = 0.5, face = "bold.italic", family = "Times New Roman")) +
-  theme(panel.grid.major=element_line(colour=NA), 
-        panel.grid.minor = element_blank(), 
-        panel.background = element_blank(), 
-        axis.line = element_line(colour = "black"))
-# save picture
-ggsave("boxplot_spec.png")
 
-
-auc1 <- data.frame(myput_auc)
-colnames(auc1) <- "auc"
-auc1$model <- "LRA3"
-auc2 <- data.frame(myput_auc1)
-colnames(auc2) <- "auc"
-auc2$model <- "LRA2"
-auc3 <- data.frame(myput2)
-colnames(auc3) <- "auc"
-auc3$model <- "LRA4"
-auc4 <- data.frame(myput_auc3)
-colnames(auc4) <- "auc"
-auc4$model <- "LRA5"
-boxplot_auc <- rbind(auc1, auc2, auc3, auc4)
-head(boxplot_auc, 10)
-# drawing sensitivity's boxplot
-ggplot(data = boxplot_auc, aes(x = model, y = auc)) + 
-  geom_boxplot(notch = T, outlier.shape = NA, aes(fill = factor(model))) + 
-  scale_fill_brewer(palette = "Pastel2") +
-  stat_summary(fun.y = "mean", size = 2, geom = "point") +
-  labs(x = "Model", y = "Auc", title = "10-fold cross validation") +
-  theme(plot.title = element_text(hjust = 0.5, face = "bold.italic", family = "Times New Roman")) +
-  theme(panel.grid.major=element_line(colour=NA), 
-        panel.grid.minor = element_blank(), 
-        panel.background = element_blank(), 
-        axis.line = element_line(colour = "black"))
-ggsave("boxplot_auc.png")
-
-
-# estabilsh the data frame of sensitivity in the light of model
-sens1 <- data.frame(myput_sens)
-colnames(sens1) <- "sens"
-sens1$model <- "LRA3"
-sens4 <- data.frame(myput_sens3)
-colnames(sens4) <- "sens"
-sens4$model <- "LRA5"
-boxplot_sens14 <- rbind(sens1,sens4)
-View(boxplot_sens14)
-# drawing sensitivity's boxplot
-ggplot(data = boxplot_sens, aes(x = model, y = sens)) + 
-  geom_boxplot(notch = F, outlier.shape = NA, aes(fill = factor(model))) + 
-  scale_fill_brewer(palette = "Pastel2") +
-  stat_summary(fun.y = "mean", size = 2, geom = "point") +
-  labs(x = "Model", y = "Sensitivity", title = "10-fold cross validation") +
-  theme(plot.title = element_text(hjust = 0.5, face = "bold.italic", family = "Times New Roman")) +
-  theme(panel.grid.major=element_line(colour=NA), 
-        panel.grid.minor = element_blank(), 
-        panel.background = element_blank(), 
-        axis.line = element_line(colour = "black"))
-# save picture
-ggsave("boxplot_sens2.png")
-dev.off()
 
